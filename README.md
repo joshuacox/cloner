@@ -14,7 +14,7 @@ you can also give the name of the directory to be made:
 
 `cloner git@github.com:joshuacox/cloner.git my_cloner`
 
-## explanation of what happens
+## Explanation
 
 If the script is given a directory name, first we make a new directory with the name, 
 if we are not given the name we will derive it from the repo name and make the directory with that name.  
