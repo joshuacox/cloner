@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+useage () {
+  echo "$0 repo_to_clone"
+}
+if [[ $# -eq 1 ]]; then
+TARGET_REPO=$1
+TARGET_DIR=$(echo "$1"|awk -F'/' '{print $NF}'|sed 's/^\(.*\)\.git/\1/')
+elif [[ $# -eq 2 ]]; then
+TARGET_REPO=$1
+TARGET_DIR=$2
+else 
+  useage
+  exit 1
+fi
+
+mkdir ${TARGET_DIR}
+cd ${TARGET_DIR}
+git clone --bare $1 .git
+echo "gitdir: ./.git" > .git
+git worktree add main
+
+
