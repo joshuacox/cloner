@@ -24,6 +24,24 @@ Then we make a new worktree for the `main` branch.
 
 ## exempli gratia
 
+Let's start by cloning this repo:
+
+```
+$ cloner git@github.com:joshuacox/cloner.git
+Cloning into bare repository '.git'...
+remote: Enumerating objects: 26, done.
+remote: Counting objects: 100% (26/26), done.
+remote: Compressing objects: 100% (19/19), done.
+remote: Total 26 (delta 8), reused 21 (delta 6), pack-reused 0 (from 0)
+Receiving objects: 100% (26/26), 16.61 KiB | 16.61 MiB/s, done.
+Resolving deltas: 100% (8/8), done.
+/usr/local/bin/cloner: line 19: .git: Is a directory
+Preparing worktree (checking out 'main')
+HEAD is now at c6ab44d eg
+```
+
+Now let's create a new branch/worktree:
+
 ```
 $ git worktree add new_feature
 Preparing worktree (new branch 'new_feature')
