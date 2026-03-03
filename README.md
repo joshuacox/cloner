@@ -86,3 +86,12 @@ $ tree
 
 5 directories, 12 files
 ```
+
+
+## VERBOSITY
+  
+  You can adjust VERBOSITY e.g.
+
+```
+VERBOSITY=100 cloner repo_to_clone
+```
