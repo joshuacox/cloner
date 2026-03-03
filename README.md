@@ -1,5 +1,19 @@
 # cloner
 
+## build
+
+### oneliner
+
+curl -sL https://raw.githubusercontent.com/joshuacox/cloner/refs/heads/main/bootstrapcloner.sh | bash
+
+### cmake
+
+```
+cmake .
+make
+sudo make install
+```
+
 Clones a git repo in a manner suitable for worktrees
 
 ## useage
