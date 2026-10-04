@@ -21,8 +21,17 @@ install(
     DESTINATION share/man/man1
     COMPONENT Runtime
 )
+
+# Add uninstall target
+add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -E remove -f
+        "${CMAKE_INSTALL_PREFIX}/bin/${CLONER_NAME}"
+        "${CMAKE_INSTALL_PREFIX}/share/man/man1/cloner.1"
+    COMMENT "Uninstalling cloner binary and man page from ${CMAKE_INSTALL_PREFIX}"
+)
+
 # --------------------------------------------------------------
-# Optional: make the install prefix visible to the user (helpful for packaging)
+# Make the install prefix visible to the user (helpful for packaging)
 # --------------------------------------------------------------
 message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "Binary will be installed to: ${CMAKE_INSTALL_PREFIX}/bin")

@@ -1,28 +1,61 @@
-.cloner(1) -- clone git repos for worktree workflows
-
-NAME
-       cloner - a facilitator for the git worktree workflow
-
-SYNOPSIS
-       cloner [options]
-
-DESCRIPTION
-       cloner - a wrapper around git clone to setup the directory for the worktree workflow
-
-USAGE
-
-       cloner repo_to_clone
-
-       e.g.
-
-       cloner git@github.com:joshuacox/cloner.git
-
-VERBOSITY
-       
-       VERBOSITY=100 cloner repo_to_clone
-
-
-
-AUTHOR
-       joshua Edward McLauglin Cox
-       http://joshuacox.github.io/cloner
+.TH CLONER 1 "October 2026" "cloner" "User Commands"
+.SH NAME
+cloner \- clone git repositories structured for git worktree workflows
+.SH SYNOPSIS
+.B cloner
+[\fIOPTIONS\fR] \fIREPOSITORY\fR [\fIDIRECTORY\fR]
+.SH DESCRIPTION
+.B cloner
+is a wrapper around \fBgit clone\fR and \fBgit worktree\fR designed to facilitate
+clean worktree workflows.
+.PP
+Instead of cloning directly into a working directory, \fBcloner\fR creates a parent
+directory containing a bare repository in \fB.git\fR, configures remote tracking
+branches for subsequent worktrees, and adds an initial worktree corresponding
+to the remote default branch (or a branch explicitly specified).
+.SH OPTIONS
+.TP
+.BR \-b ", " \-\-branch " \fINAME\fR"
+Specify the branch to check out in the initial worktree. If omitted, \fBcloner\fR
+automatically detects the remote default branch.
+.TP
+.BR \-v ", " \-\-verbose
+Enable verbose output.
+.TP
+.BR \-q ", " \-\-quiet
+Suppress non-error progress messages.
+.TP
+.BR \-h ", " \-\-help
+Display usage information and exit.
+.SH ENVIRONMENT
+.TP
+.B VERBOSITY
+Integer controlling verbosity (default: 10). Set to 0 for quiet operation.
+.SH EXAMPLES
+Clone a repository into a directory named after the repo and check out its default branch:
+.PP
+.RS
+.nf
+cloner git@github.com:joshuacox/cloner.git
+.fi
+.RE
+.PP
+Clone into a custom directory name:
+.PP
+.RS
+.nf
+cloner git@github.com:joshuacox/cloner.git my_cloner
+.fi
+.RE
+.PP
+Clone and check out a specific branch:
+.PP
+.RS
+.nf
+cloner --branch develop git@github.com:joshuacox/cloner.git
+.fi
+.RE
+.SH AUTHOR
+Joshua Edward McLaughlin Cox
+.br
+http://joshuacox.github.io/cloner

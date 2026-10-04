@@ -1,29 +1,165 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 : "${VERBOSITY:=10}"
 
-useage () {
-  echo "$0 repo_to_clone"
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [OPTIONS] <repository> [directory]
+
+Clones a git repository structured for git worktree workflows.
+
+Arguments:
+  <repository>       Git repository URL or path to clone
+  [directory]        Destination directory name (defaults to repository name)
+
+Options:
+  -b, --branch <name> Specify branch to check out (defaults to remote default branch)
+  -v, --verbose       Increase verbosity
+  -q, --quiet         Suppress non-error messages
+  -h, --help          Show this help message and exit
+
+Environment Variables:
+  VERBOSITY           Integer verbosity level (default: 10, quiet: 0)
+EOF
 }
 
-if [[ $# -eq 1 ]]; then
-  TARGET_REPO=$1
-  TARGET_DIR=$(echo "$1"|awk -F'/' '{print $NF}'|sed 's/^\(.*\)\.git/\1/')
-elif [[ $# -eq 2 ]]; then
-  TARGET_REPO=$1
-  TARGET_DIR=$2
-else 
-  useage
+TARGET_REPO=""
+TARGET_DIR=""
+CUSTOM_BRANCH=""
+
+# Parse command line options
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -b|--branch)
+      if [[ -z "${2:-}" ]]; then
+        echo "Error: $1 requires a branch name argument" >&2
+        exit 1
+      fi
+      CUSTOM_BRANCH="$2"
+      shift 2
+      ;;
+    -v|--verbose)
+      VERBOSITY=20
+      shift
+      ;;
+    -q|--quiet)
+      VERBOSITY=0
+      shift
+      ;;
+    -*)
+      echo "Error: Unknown option '$1'" >&2
+      usage >&2
+      exit 1
+      ;;
+    *)
+      if [[ -z "${TARGET_REPO}" ]]; then
+        TARGET_REPO="$1"
+      elif [[ -z "${TARGET_DIR}" ]]; then
+        TARGET_DIR="$1"
+      else
+        echo "Error: Unexpected argument '$1'" >&2
+        usage >&2
+        exit 1
+      fi
+      shift
+      ;;
+  esac
+done
+
+if [[ -z "${TARGET_REPO}" ]]; then
+  usage >&2
   exit 1
 fi
 
-if [[ ${VERBOSITY} -gt 0 ]]
-then
-  echo "Cloning ${TARGET_REPO} into ${TARGET_DIR}"
-  mkdir -v "${TARGET_DIR}"
-else
-  mkdir "${TARGET_DIR}"
+if [[ -z "${TARGET_DIR}" ]]; then
+  # Strip trailing slashes
+  CLEANED_REPO="${TARGET_REPO%/}"
+  # Strip .git suffix if present
+  CLEANED_REPO="${CLEANED_REPO%.git}"
+  # Extract basename handling standard URLs and SCP-style URLs
+  TARGET_DIR="${CLEANED_REPO##*/}"
+  TARGET_DIR="${TARGET_DIR##*:}"
 fi
 
-cd "${TARGET_DIR}" || exit 1
-git clone --bare "${TARGET_REPO}" .git
-git worktree add main
+if [[ -e "${TARGET_DIR}" ]]; then
+  echo "Error: Destination directory '${TARGET_DIR}' already exists." >&2
+  exit 1
+fi
+
+CREATED_DIR=""
+cleanup() {
+  if [[ -n "${CREATED_DIR}" && -d "${CREATED_DIR}" ]]; then
+    if [[ ${VERBOSITY} -gt 0 ]]; then
+      echo "An error occurred. Cleaning up '${CREATED_DIR}'..." >&2
+    fi
+    rm -rf "${CREATED_DIR}"
+  fi
+}
+trap cleanup ERR
+
+if [[ ${VERBOSITY} -gt 0 ]]; then
+  echo "Cloning ${TARGET_REPO} into ${TARGET_DIR}..."
+fi
+
+mkdir -p "${TARGET_DIR}"
+CREATED_DIR="$(cd "${TARGET_DIR}" && pwd)"
+
+cd "${TARGET_DIR}"
+
+# Clone bare repository directly into .git
+if [[ ${VERBOSITY} -eq 0 ]]; then
+  git clone --bare --quiet "${TARGET_REPO}" .git
+else
+  git clone --bare "${TARGET_REPO}" .git
+fi
+
+# Configure fetch refspec so remote tracking branches exist for worktrees
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+if [[ ${VERBOSITY} -eq 0 ]]; then
+  git fetch origin --quiet
+else
+  git fetch origin
+fi
+
+# Determine default branch to check out
+BRANCH_TO_CHECKOUT="${CUSTOM_BRANCH}"
+if [[ -z "${BRANCH_TO_CHECKOUT}" ]]; then
+  # Try origin/HEAD first
+  DETECTED_BRANCH=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||' || true)
+  if [[ -n "${DETECTED_BRANCH}" ]]; then
+    BRANCH_TO_CHECKOUT="${DETECTED_BRANCH}"
+  elif git show-ref --verify --quiet refs/heads/main; then
+    BRANCH_TO_CHECKOUT="main"
+  elif git show-ref --verify --quiet refs/heads/master; then
+    BRANCH_TO_CHECKOUT="master"
+  else
+    # Fallback to the first local or remote branch found
+    BRANCH_TO_CHECKOUT=$(git branch --list | head -n1 | tr -d ' *' || true)
+  fi
+fi
+
+if [[ -z "${BRANCH_TO_CHECKOUT}" ]]; then
+  echo "Warning: Could not detect default branch; worktree creation skipped." >&2
+else
+  if [[ ${VERBOSITY} -gt 0 ]]; then
+    echo "Creating worktree for branch '${BRANCH_TO_CHECKOUT}'..."
+  fi
+  if [[ ${VERBOSITY} -eq 0 ]]; then
+    git worktree add --quiet "${BRANCH_TO_CHECKOUT}"
+  else
+    git worktree add "${BRANCH_TO_CHECKOUT}"
+  fi
+fi
+
+# Success: disarm the error cleanup trap
+CREATED_DIR=""
+trap - ERR
+
+if [[ ${VERBOSITY} -gt 0 ]]; then
+  echo "Successfully set up worktree workspace in ${TARGET_DIR}"
+fi
