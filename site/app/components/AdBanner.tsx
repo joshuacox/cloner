@@ -35,10 +35,10 @@ export default function AdBanner({
   return (
     <aside
       aria-label="Advertisement"
-      className={`my-8 mx-auto w-full max-w-4xl px-4 py-3 text-center ${className}`}
+      className={`my-10 mx-auto w-full max-w-4xl px-4 text-center ${className}`}
     >
-      <div className="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-4 transition-colors">
-        <span className="block text-[11px] font-medium tracking-wider uppercase text-zinc-400 dark:text-zinc-500 mb-2">
+      <div className="rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/20 py-2 px-4 transition-colors">
+        <span className="block text-[10px] font-mono tracking-widest uppercase text-zinc-400 dark:text-zinc-600 mb-1">
           Advertisement
         </span>
         <div className="min-h-[90px] flex items-center justify-center overflow-hidden">
