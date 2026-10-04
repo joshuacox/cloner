@@ -1,0 +1,18 @@
+#compdef cloner
+
+_cloner() {
+    local -a args
+    args=(
+        '(-b --branch)'{-b,--branch}'[Specify branch to check out]:branch name'
+        '--depth[Create shallow clone with history truncated to depth]:depth:(1 5 10 50 100)'
+        '(-v --verbose)'{-v,--verbose}'[Increase verbosity]'
+        '(-q --quiet)'{-q,--quiet}'[Suppress non-error messages]'
+        '(-V --version)'{-V,--version}'[Show version information and exit]'
+        '(-h --help)'{-h,--help}'[Show usage information and exit]'
+        '1:repository: '
+        '2:directory:_files -/'
+    )
+    _arguments -s -S $args
+}
+
+_cloner "$@"

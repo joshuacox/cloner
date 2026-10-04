@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -50,8 +51,10 @@ export default function Navbar() {
             </Link>
           </nav>
 
-          {/* Right Action: GitHub button & mobile toggle */}
+          {/* Right Action: Theme toggle, GitHub button & mobile toggle */}
           <div className="flex items-center gap-3">
+            <ThemeToggle />
+
             <a
               href="https://github.com/joshuacox/cloner"
               target="_blank"

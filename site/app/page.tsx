@@ -2,6 +2,7 @@ import Link from "next/link";
 import CodeBlock from "./components/CodeBlock";
 import AdBanner from "./components/AdBanner";
 import WorktreeVisualizer from "./components/WorktreeVisualizer";
+import CommandGenerator from "./components/CommandGenerator";
 
 export default function HomePage() {
   return (
@@ -68,6 +69,11 @@ export default function HomePage() {
       {/* Interactive Visualizer Component */}
       <section id="architecture" className="scroll-mt-20">
         <WorktreeVisualizer />
+      </section>
+
+      {/* Interactive Command Generator & Simulator */}
+      <section id="playground" className="scroll-mt-20">
+        <CommandGenerator />
       </section>
 
       {/* Deep-Dive: Why Cloner? */}
@@ -285,17 +291,31 @@ export default function HomePage() {
                 </td>
               </tr>
               <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">
+                <td className="px-4 py-3 text-emerald-600 dark:text-emerald-400 font-bold">--depth</td>
+                <td className="px-4 py-3 text-zinc-500">&lt;depth&gt;</td>
+                <td className="px-4 py-3 font-sans text-zinc-600 dark:text-zinc-400">
+                  Create a shallow clone with history truncated to the specified number of commits.
+                </td>
+              </tr>
+              <tr className="bg-white dark:bg-zinc-950">
                 <td className="px-4 py-3 text-emerald-600 dark:text-emerald-400 font-bold">-v, --verbose</td>
                 <td className="px-4 py-3 text-zinc-500">None</td>
                 <td className="px-4 py-3 font-sans text-zinc-600 dark:text-zinc-400">
                   Enable high verbosity progress output.
                 </td>
               </tr>
-              <tr className="bg-white dark:bg-zinc-950">
+              <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">
                 <td className="px-4 py-3 text-emerald-600 dark:text-emerald-400 font-bold">-q, --quiet</td>
                 <td className="px-4 py-3 text-zinc-500">None</td>
                 <td className="px-4 py-3 font-sans text-zinc-600 dark:text-zinc-400">
                   Suppress informational messages (errors remain visible).
+                </td>
+              </tr>
+              <tr className="bg-white dark:bg-zinc-950">
+                <td className="px-4 py-3 text-emerald-600 dark:text-emerald-400 font-bold">-V, --version</td>
+                <td className="px-4 py-3 text-zinc-500">None</td>
+                <td className="px-4 py-3 font-sans text-zinc-600 dark:text-zinc-400">
+                  Print version information and exit.
                 </td>
               </tr>
               <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">

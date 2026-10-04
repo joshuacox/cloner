@@ -144,4 +144,57 @@ if [[ -e "failed_dir" ]]; then
 fi
 echo "PASS"
 
+# 10. Test Version flag
+echo -n "Test 10: Version flag (-V / --version)... "
+V_OUT=$("${CLONER_BIN}" -V)
+if [[ "${V_OUT}" != *"cloner version 1.1.0"* ]]; then
+  echo "FAIL (unexpected version output: ${V_OUT})"
+  exit 1
+fi
+VERSION_OUT=$("${CLONER_BIN}" --version)
+if [[ "${VERSION_OUT}" != *"cloner version 1.1.0"* ]]; then
+  echo "FAIL (unexpected --version output: ${VERSION_OUT})"
+  exit 1
+fi
+echo "PASS"
+
+# 11. Test Shallow clone (--depth 1)
+echo -n "Test 11: Shallow clone (--depth 1)... "
+cd "${WORK_DIR}"
+"${CLONER_BIN}" -q --depth 1 "file://${MOCK_REPOS}/repo_main.git" shallow_main_dir
+if [[ ! -d "shallow_main_dir/main" ]]; then
+  echo "FAIL (shallow worktree directory not found)"
+  exit 1
+fi
+cd "shallow_main_dir"
+COMMIT_COUNT=$(git rev-list --count HEAD)
+if [[ "${COMMIT_COUNT}" -ne 1 ]]; then
+  echo "FAIL (expected 1 commit in shallow clone, got ${COMMIT_COUNT})"
+  exit 1
+fi
+echo "PASS"
+
+# 12. Test Makefile install and uninstall
+echo -n "Test 12: Makefile install & uninstall... "
+SANDBOX_PREFIX="${TEST_TMP}/sandbox_prefix"
+make -C "${SCRIPT_DIR}/.." install PREFIX="${SANDBOX_PREFIX}" >/dev/null
+if [[ ! -x "${SANDBOX_PREFIX}/bin/cloner" ]]; then
+  echo "FAIL (installed binary not found)"
+  exit 1
+fi
+if [[ ! -f "${SANDBOX_PREFIX}/share/man/man1/cloner.1" ]]; then
+  echo "FAIL (installed man page not found)"
+  exit 1
+fi
+if [[ ! -f "${SANDBOX_PREFIX}/share/bash-completion/completions/cloner" ]]; then
+  echo "FAIL (installed bash completion not found)"
+  exit 1
+fi
+make -C "${SCRIPT_DIR}/.." uninstall PREFIX="${SANDBOX_PREFIX}" >/dev/null
+if [[ -e "${SANDBOX_PREFIX}/bin/cloner" ]]; then
+  echo "FAIL (uninstalled binary still exists)"
+  exit 1
+fi
+echo "PASS"
+
 echo "=== All Tests Passed Successfully! ==="

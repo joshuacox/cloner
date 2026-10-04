@@ -19,11 +19,17 @@ to the remote default branch (or a branch explicitly specified).
 Specify the branch to check out in the initial worktree. If omitted, \fBcloner\fR
 automatically detects the remote default branch.
 .TP
+.BR \-\-depth " \fIDEPTH\fR"
+Create a shallow clone with history truncated to the specified number of commits.
+.TP
 .BR \-v ", " \-\-verbose
 Enable verbose output.
 .TP
 .BR \-q ", " \-\-quiet
 Suppress non-error progress messages.
+.TP
+.BR \-V ", " \-\-version
+Print version information and exit.
 .TP
 .BR \-h ", " \-\-help
 Display usage information and exit.
@@ -48,11 +54,11 @@ cloner git@github.com:joshuacox/cloner.git my_cloner
 .fi
 .RE
 .PP
-Clone and check out a specific branch:
+Clone shallow with depth 1 and check out a specific branch:
 .PP
 .RS
 .nf
-cloner --branch develop git@github.com:joshuacox/cloner.git
+cloner --depth 1 --branch develop git@github.com:joshuacox/cloner.git
 .fi
 .RE
 .SH AUTHOR

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+VERSION="1.1.0"
 : "${VERBOSITY:=10}"
 
 usage() {
@@ -14,19 +15,22 @@ Arguments:
   [directory]        Destination directory name (defaults to repository name)
 
 Options:
-  -b, --branch <name> Specify branch to check out (defaults to remote default branch)
-  -v, --verbose       Increase verbosity
-  -q, --quiet         Suppress non-error messages
-  -h, --help          Show this help message and exit
+  -b, --branch <name>  Specify branch to check out (defaults to remote default branch)
+      --depth <depth>  Create a shallow clone with history truncated to specified depth
+  -v, --verbose        Increase verbosity
+  -q, --quiet          Suppress non-error messages
+  -V, --version        Show version information and exit
+  -h, --help           Show this help message and exit
 
 Environment Variables:
-  VERBOSITY           Integer verbosity level (default: 10, quiet: 0)
+  VERBOSITY            Integer verbosity level (default: 10, quiet: 0)
 EOF
 }
 
 TARGET_REPO=""
 TARGET_DIR=""
 CUSTOM_BRANCH=""
+CUSTOM_DEPTH=""
 
 # Parse command line options
 while [[ $# -gt 0 ]]; do
@@ -35,12 +39,24 @@ while [[ $# -gt 0 ]]; do
       usage
       exit 0
       ;;
+    -V|--version)
+      echo "cloner version ${VERSION}"
+      exit 0
+      ;;
     -b|--branch)
       if [[ -z "${2:-}" ]]; then
         echo "Error: $1 requires a branch name argument" >&2
         exit 1
       fi
       CUSTOM_BRANCH="$2"
+      shift 2
+      ;;
+    --depth)
+      if [[ -z "${2:-}" ]]; then
+        echo "Error: $1 requires a depth argument" >&2
+        exit 1
+      fi
+      CUSTOM_DEPTH="$2"
       shift 2
       ;;
     -v|--verbose)
@@ -111,12 +127,16 @@ CREATED_DIR="$(cd "${TARGET_DIR}" && pwd)"
 
 cd "${TARGET_DIR}"
 
-# Clone bare repository directly into .git
-if [[ ${VERBOSITY} -eq 0 ]]; then
-  git clone --bare --quiet "${TARGET_REPO}" .git
-else
-  git clone --bare "${TARGET_REPO}" .git
+CLONE_ARGS=("--bare")
+if [[ -n "${CUSTOM_DEPTH}" ]]; then
+  CLONE_ARGS+=("--depth" "${CUSTOM_DEPTH}")
 fi
+
+if [[ ${VERBOSITY} -eq 0 ]]; then
+  CLONE_ARGS+=("--quiet")
+fi
+
+git clone "${CLONE_ARGS[@]}" "${TARGET_REPO}" .git
 
 # Configure fetch refspec so remote tracking branches exist for worktrees
 git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"

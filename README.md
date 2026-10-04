@@ -10,6 +10,18 @@
 curl -sL https://raw.githubusercontent.com/joshuacox/cloner/refs/heads/main/bootstrapcloner.sh | bash
 ```
 
+### Makefile (Zero-Dependency)
+
+```bash
+sudo make install
+```
+
+To run tests or uninstall:
+```bash
+make test
+sudo make uninstall
+```
+
 ### CMake
 
 ```bash
@@ -34,9 +46,17 @@ cloner [OPTIONS] <repo_to_clone> [target_directory]
 ### Options
 
 * `-b, --branch <branch_name>`: Specify a branch to check out initially (defaults to the remote's default branch).
+* `--depth <depth>`: Create a shallow clone with history truncated to the specified number of commits.
 * `-v, --verbose`: Increase output verbosity.
 * `-q, --quiet`: Quiet mode; suppresses informational messages.
-* `-h, --help`: Show usage instructions.
+* `-V, --version`: Show version information and exit.
+* `-h, --help`: Show usage instructions and exit.
+
+### Shell Completions
+
+Bash and Zsh completions are installed automatically with `make install` or `make -C build install`:
+* Bash: `/usr/local/share/bash-completion/completions/cloner`
+* Zsh: `/usr/local/share/zsh/site-functions/_cloner`
 
 ### Examples
 
@@ -56,6 +76,12 @@ Specify a custom initial branch:
 
 ```bash
 cloner --branch develop git@github.com:joshuacox/cloner.git
+```
+
+Clone shallow with depth 1 (great for large repositories):
+
+```bash
+cloner --depth 1 git@github.com:torvalds/linux.git
 ```
 
 ---

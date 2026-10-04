@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    name: ShellCheck Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck
+        run: shellcheck cloner bootstrapcloner.sh test/test_cloner.sh
+
+  test:
+    name: Test Suite (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Cloner Test Suite
+        run: ./test/test_cloner.sh
+
+      - name: Test Makefile Install & Uninstall
+        run: |
+          make install PREFIX=/tmp/cloner-ci-install
+          test -x /tmp/cloner-ci-install/bin/cloner
+          test -f /tmp/cloner-ci-install/share/man/man1/cloner.1
+          make uninstall PREFIX=/tmp/cloner-ci-install
+          ! test -e /tmp/cloner-ci-install/bin/cloner
+
+  site-build:
+    name: Build Next.js Documentation Site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install Dependencies
+        run: cd site && npm ci
+
+      - name: Build Static Export
+        run: cd site && npm run build
