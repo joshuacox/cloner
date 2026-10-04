@@ -26,8 +26,8 @@ export default function Footer() {
             <h3 className="font-semibold text-zinc-900 dark:text-zinc-200 mb-3">Documentation</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/#architecture" className="hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
-                  Worktree Architecture
+                <Link href="/#explorer" className="hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
+                  Worktree Explorer
                 </Link>
               </li>
               <li>

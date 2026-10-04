@@ -1,11 +1,8 @@
-name: Deploy Documentation to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - 'site/**'
-      - '.github/workflows/deploy-pages.yml'
+    branches: [ main, master ]
   workflow_dispatch:
 
 permissions:
@@ -14,37 +11,36 @@ permissions:
   id-token: write
 
 concurrency:
-  group: 'pages'
-  cancel-in-progress: true
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
-    name: Build Static Site
+    name: Build Next.js Static Export
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: site/package-lock.json
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: Install dependencies
+        working-directory: ./site
+        run: npm ci
 
-      - name: Install Dependencies
-        run: cd site && npm ci
+      - name: Build static site
+        working-directory: ./site
+        run: npm run build
 
-      - name: Build Static Next.js Site
-        run: cd site && npm run build
-
-      - name: Upload Pages Artifact
+      - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site/out
+          path: ./site/out
 
   deploy:
     name: Deploy to GitHub Pages

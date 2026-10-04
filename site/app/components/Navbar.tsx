@@ -28,8 +28,8 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-600 dark:text-zinc-300" aria-label="Main Navigation">
-            <Link href="/#architecture" className="hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
-              Architecture
+            <Link href="/#explorer" className="hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
+              Explorer
             </Link>
             <Link href="/#installation" className="hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
               Installation
@@ -90,11 +90,11 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 pt-3 pb-5 space-y-2">
           <Link
-            href="/#architecture"
+            href="/#explorer"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2 rounded-md text-base font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900"
           >
-            Architecture
+            Explorer
           </Link>
           <Link
             href="/#installation"
