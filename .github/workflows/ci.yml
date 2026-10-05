@@ -49,15 +49,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: site/package-lock.json
+          node-version: "20"
+          cache: "pnpm"
+          cache-dependency-path: site/pnpm-lock.yaml
 
       - name: Install Dependencies
-        run: cd site && npm ci
+        working-directory: ./site
+        run: pnpm install --frozen-lockfile
 
       - name: Build Static Export
-        run: cd site && npm run build
+        working-directory: ./site
+        run: pnpm run build

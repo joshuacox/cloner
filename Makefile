@@ -30,10 +30,10 @@ test:
 	./test/test_cloner.sh
 
 site-install:
-	cd site && npm install
+	cd site && pnpm install
 
 site-dev:
-	cd site && npm run dev
+	cd site && pnpm run dev
 
 site-build:
-	cd site && npm run build
+	cd site && pnpm run build
